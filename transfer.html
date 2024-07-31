@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer Money</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            background-image: url(https://i.pinimg.com/originals/52/32/bc/5232bc4487e2ea0306741aa3bd2a553f.jpg);
+        }
+        .transfer-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .transfer-container h2 {
+            margin: 0 0 20px;
+            text-align: center;
+        }
+        .transfer-container input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .transfer-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .transfer-container button:hover {
+            background-color: #0056b3;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="transfer-container">
+        <h2>Transfer Money</h2>
+        <form id="transfer-form">
+            <input type="text" id="recipient" placeholder="Recipient's Name" required>
+            <input type="text" id="account" placeholder="Recipient's Account Number" required>
+            <input type="number" id="amount" placeholder="Amount" min="0.01" step="0.01" required>
+            <button type="submit">Transfer</button>
+        </form>
+        <a href="homepage.html" class="back-link">Back to Home</a>
+    </div>
+    
+    <script>
+        document.getElementById('transfer-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let recipient = document.getElementById('recipient').value;
+            let account = document.getElementById('account').value;
+            let amount = parseFloat(document.getElementById('amount').value);
+    
+            // Retrieve the current balance from local storage
+            let currentBalance = parseFloat(localStorage.getItem('currentBalance')) || 5000;
+    
+            // Check if sufficient funds are available
+            if (amount > currentBalance) {
+                alert("Insufficient funds!");
+                return;
+            }
+    
+            // Update the balance
+            currentBalance -= amount;
+            localStorage.setItem('currentBalance', currentBalance.toFixed(2));
+    
+            // Create transaction object
+            const transaction = {
+                date: new Date().toLocaleDateString(),
+                description: recipient,
+                amount: (amount >= 0 ? `$${amount.toFixed(2)}` : `-$${Math.abs(amount).toFixed(2)}`)
+            };
+    
+            // Retrieve existing transaction history or create a new one
+            const transactionHistory = JSON.parse(localStorage.getItem('transactionHistory')) || [];
+            transactionHistory.push(transaction);
+            localStorage.setItem('transactionHistory', JSON.stringify(transactionHistory));
+    
+            // Store transaction details in local storage
+            localStorage.setItem('transferRecipient', recipient);
+            localStorage.setItem('transferAccount', account);
+            localStorage.setItem('transferAmount', amount.toFixed(2));
+    
+            // Redirect to the success page
+            window.location.href = 'successful.html';
+        });
+    </script>
+</body>
+</html>
